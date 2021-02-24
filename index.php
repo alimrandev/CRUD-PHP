@@ -3,19 +3,37 @@ session_name('auth');
 session_start();
 require_once "./inc/function.php";
 $_SESSION['loggedin'] = $_SESSION['loggedin']??false;
-var_dump($_SESSION['loggedin']);
+$_SESSION['role'] = $_SESSION['role']??false;
+// var_dump($_SESSION['loggedin']);
     $info = '';
     $task = $_GET['task'] ?? 'report';
     $error = $_GET['error'] ?? '0';
+    
+    // protect edit
+    if('edit' == $task){
+        if(!isPrivilege()){
+            header("location: index.php?task=report");
+            return;
+        }
+    }
+   
     if('seed' == $task) {
+        if(isAdmin()){
         seed();
         $info = 'Data Seeding Completed';
+        }
+        header("location: index.php?task=report");
+
     }
     //delete
     if('delete' == $task) {
-        $id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_STRING);
-        deleteStudent($id);
+        if(isAdmin()){
+            $id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_STRING);
+            deleteStudent($id);
+            header("location: index.php?task=report");
+        }
         header("location: index.php?task=report");
+        
     }
     //let define inputs
     $fname  = '';
@@ -117,13 +135,20 @@ var_dump($_SESSION['loggedin']);
                     <tr>
                         <td>Name</td>
                         <td>Roll</td>
+                    <?php if(isPrivilege()) :?>    
                         <td>Action</td>
+                    <?php endif;?>  
                     </tr>
                     <?php foreach($students as $student):?>
                         <tr>
                             <td><?php printf('%s %s', $student['fname'], $student['lname'])?></td>
                             <td><?php printf('%s', $student['roll']) ?></td>
-                            <td><a href="index.php?task=edit&id=<?php echo $student['id']?>">Edit</a> | <a href="index.php?task=delete&id=<?php echo $student['id']?>" class="confirm">Delete</a></td>
+                            <?php if(isPrivilege()) :?>    
+                            <td><a href="index.php?task=edit&id=<?php echo $student['id']?>">Edit</a> 
+                            <?php if(isAdmin()) :?>
+                            |<a href="index.php?task=delete&id=<?php echo $student['id']?>" class="confirm">Delete</a></td>
+                            <?php endif;?>
+                            <?php endif;?>  
                         </tr>
                     <?php endforeach?>
                 </table>

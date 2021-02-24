@@ -20,7 +20,6 @@ if(isset($username) && isset($password)){
             $_SESSION['role'] = $data['2'];
             header('location: index.php');
         }else{
-            $_SESSION['loggedin'] = false; 
             $error = true;
         }
     }

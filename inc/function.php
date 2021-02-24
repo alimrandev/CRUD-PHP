@@ -146,3 +146,16 @@ function deleteStudent($id){
     file_put_contents(DB_NAME, $serializedData, LOCK_EX);
 
 }
+
+//isAdmin
+function isAdmin(){
+    return "admin" == $_SESSION['role'];
+};
+
+function isEditor(){
+    return "editor" == $_SESSION['role'];
+};
+
+function isPrivilege(){
+    return ("admin" == $_SESSION['role'] || "editor" == $_SESSION['role']);
+};
